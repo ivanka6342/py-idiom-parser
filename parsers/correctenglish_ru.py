@@ -40,9 +40,16 @@ def get_pages_num(search_url):
 
 
 def prepare_collection(search_string):
+    """
+    there are 3 types of search result:
+    1. empty (e.g. for word "edyhrthjr") - no idioms_block, no pages
+    2. single-page (e.g. "burn") - idioms_block is present, 'square_links' div is not
+    3. multi-page (e.g. "one's") - both idioms_block and page_num_block are present
+    this func searches by words from the search_string and processes pages of each type
+    """
     idiom_collection = []
 
-    # split lowercase search_string into words
+    # split search_string into words more than 3 letters to search by each single word (not the entire phrase)
     words = re.findall(r"[a-z']{3,}", search_string)
     for word in words:
         search_url = domain + '/reference/idioms/search/?idiom=' + word + '&criteria=name'
@@ -50,7 +57,6 @@ def prepare_collection(search_string):
             # Nothing Found
             continue
 
-        # find out the number of pages
         pages_num = get_pages_num(search_url)
 
         # collect all idioms from all pages
@@ -58,7 +64,7 @@ def prepare_collection(search_string):
             search_url = domain + '/reference/idioms/search/?page=' + str(pg_num) + '&idiom=' + word + '&criteria=name'
             idioms_block = get_idioms_block(search_url)
 
-            # sometimes it include 'square_links' block (with page num buttons)
+            # if the search result is multi-page, then page includes 'square_links' block (with page num buttons)
             idioms = idioms_block.find_all('a')
             if idioms_block.find('div', id="square_links") is not None:
                 idioms = idioms_block.find('div', id="square_links").find_previous_siblings('a')
@@ -98,9 +104,9 @@ def parse(search_string):
 
     for idiom_path in idioms_paths:
         full_idiom_link = domain + idiom_path
-        idiom_page_html = requests.get(full_idiom_link, timeout=5) # type: requests.Response
+        idiom_page_html = requests.get(full_idiom_link, timeout=5)
         soup = BS4(idiom_page_html.text, 'lxml')
-        center_div = soup.find_all('div', id="center_column")[0] # useful info block
+        center_div = soup.find_all('div', id="center_column")[0]
 
         idiom = {
             'title': 'title',
