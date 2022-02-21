@@ -4,6 +4,7 @@ import parser_controller
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
+    QCheckBox,
     QFileDialog,
     QHBoxLayout,
     QLabel,
@@ -76,6 +77,21 @@ class Project_X(QMainWindow):
         centralWidget.setLayout(mainLayout)
         self.setCentralWidget(centralWidget)
 
+        sites_box = QWidget()
+        sites_box_l = QHBoxLayout()
+        sites_box.setLayout(sites_box_l)
+        mainLayout.addWidget(sites_box)
+        self.cb1 = QCheckBox("correctenglish")
+        self.cb2 = QCheckBox("finedictionary")
+        self.cb3 = QCheckBox("idioms_online")
+        self.cb4 = QCheckBox("melodict_com")
+        self.cb5 = QCheckBox("merriam_webster")
+        sites_box_l.addWidget(self.cb1)
+        sites_box_l.addWidget(self.cb2)
+        sites_box_l.addWidget(self.cb3)
+        sites_box_l.addWidget(self.cb4)
+        sites_box_l.addWidget(self.cb5)
+
         search_box = QWidget()
         search_box_l = QHBoxLayout()
         search_box.setLayout(search_box_l)
@@ -137,7 +153,7 @@ class Project_X(QMainWindow):
         except req_ex as e:
             self.show_msgBox(severityLvl=QMessageBox.Warning, text=e)
         except BaseException as b:
-            self.show_msgBox(severityLvl=QMessageBox.Warning, text=b)
+            self.show_msgBox(severityLvl=QMessageBox.Warning, text=str(b))
 
 
 def main():
